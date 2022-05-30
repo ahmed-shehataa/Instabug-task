@@ -28,14 +28,15 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:textStyle="bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="12dp"
                     android:text="@string/url"
-                    android:textSize="18sp" />
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
                 <EditText
+                    android:id="@+id/et_url"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -50,26 +51,29 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:textStyle="bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="12dp"
                     android:text="@string/type"
-                    android:textSize="18sp" />
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
                 <RadioGroup
+                    android:id="@+id/type_group"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="horizontal">
 
                     <RadioButton
+                        android:id="@+id/rb_get"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="12dp"
                         android:text="@string/get" />
 
                     <RadioButton
+                        android:id="@+id/rb_post"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/post" />
@@ -77,63 +81,69 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/linear_headers_parent_host"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:gravity="center"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
-                <TextView
-                    android:textStyle="bold"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="12dp"
-                    android:layout_weight="1"
-                    android:text="@string/headers"
-                    android:textSize="18sp" />
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
 
-                <ImageView
-                    android:id="@+id/iv_add_header"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:foreground="?selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_add"
-                    app:tint="@color/purple_700" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="12dp"
+                        android:layout_weight="1"
+                        android:text="@string/headers"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
 
+                    <ImageView
+                        android:id="@+id/iv_add_header"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:foreground="?selectableItemBackgroundBorderless"
+                        android:src="@drawable/ic_add"
+                        app:tint="@color/purple_700" />
+
+                </LinearLayout>
             </LinearLayout>
-
-            <include layout="@layout/header_item" />
-
-            <include layout="@layout/header_item" />
 
             <LinearLayout
+                android:id="@+id/linear_queries_parent_host"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:textStyle="bold"
-                    android:layout_width="wrap_content"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="12dp"
-                    android:layout_weight="1"
-                    android:text="@string/query_parameters"
-                    android:textSize="18sp" />
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
 
-                <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:foreground="?selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_add"
-                    app:tint="@color/purple_700" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="12dp"
+                        android:layout_weight="1"
+                        android:text="@string/query_parameters"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
 
+                    <ImageView
+                        android:id="@+id/iv_add_query"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:foreground="?selectableItemBackgroundBorderless"
+                        android:src="@drawable/ic_add"
+                        app:tint="@color/purple_700" />
+
+                </LinearLayout>
             </LinearLayout>
-
-            <include layout="@layout/header_item" />
-
-            <include layout="@layout/header_item" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -142,14 +152,15 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:textStyle="bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="12dp"
                     android:text="@string/request_body"
-                    android:textSize="18sp" />
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
                 <EditText
+                    android:id="@+id/et_request_body"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -163,10 +174,10 @@
     </ScrollView>
 
     <Button
-        android:layout_marginTop="20dp"
         android:id="@+id/btn_send"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:text="@string/send"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -10,4 +10,6 @@
     <string name="ex_body">{ \"username\": \"1111111111\", \n "password\": \"1111111111\" }</string>
     <string name="query_parameters">Query parameters</string>
     <string name="send">send</string>
+    <string name="empty_url">Insert a URL</string>
+    <string name="empty_request_type">choose a request type</string>
 </resources>

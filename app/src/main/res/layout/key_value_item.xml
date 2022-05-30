@@ -24,7 +24,7 @@
 
     <ImageView
         android:foreground="?selectableItemBackgroundBorderless"
-        android:id="@+id/iv_remove_header"
+        android:id="@+id/iv_remove_item"
         android:layout_width="30dp"
         android:layout_height="30dp"
         app:tint="@color/red"
