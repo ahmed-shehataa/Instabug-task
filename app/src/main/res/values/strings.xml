@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">Instabug task</string>
+    <string name="url">URL</string>
+    <string name="type">Type</string>
+    <string name="get">GET</string>
+    <string name="post">POST</string>
+    <string name="headers">Headers</string>
+    <string name="ex_url">https://www.instabug.com/</string>
+    <string name="request_body">Request Body</string>
+    <string name="ex_body">{ \"username\": \"1111111111\", \n "password\": \"1111111111\" }</string>
+    <string name="query_parameters">Query parameters</string>
+    <string name="send">send</string>
 </resources>
