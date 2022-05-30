@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
 import com.ashehata.instabugtask.models.Header
+import com.ashehata.instabugtask.util.isValidURL
 
 class HomeActivity : AppCompatActivity() {
 
@@ -107,7 +108,7 @@ class HomeActivity : AppCompatActivity() {
     private fun onSendClick() {
         sendButton.setOnClickListener {
             // validate url and type request
-            if (urlEt.text.toString().isEmpty()) {
+            if (!urlEt.text.toString().isValidURL()) {
                 Toast.makeText(this, getString(R.string.empty_url), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
