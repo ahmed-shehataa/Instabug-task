@@ -1,6 +1,6 @@
 package com.ashehata.instabugtask.models
 
-data class Header(
+data class KeyValue(
     val key: String = "",
     val value: String = "",
 ) {
