@@ -1,6 +1,8 @@
 package com.ashehata.instabugtask.models
 
-sealed class HttpErrorType {
+import java.io.Serializable
+
+sealed class HttpErrorType : Serializable {
     object BadRequest : HttpErrorType()
     object NotAuthorized : HttpErrorType()
     object Forbidden : HttpErrorType()

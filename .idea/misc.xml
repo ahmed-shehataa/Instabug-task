@@ -4,7 +4,8 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/drawable/ic_minus.xml" value="0.30808337569903405" />
-        <entry key="app/src/main/res/layout/activity_home.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_home.xml" value="0.2" />
+        <entry key="app/src/main/res/layout/activity_result.xml" value="0.264" />
         <entry key="app/src/main/res/layout/header_item.xml" value="0.290625" />
         <entry key="app/src/main/res/layout/query_item.xml" value="0.290625" />
       </map>

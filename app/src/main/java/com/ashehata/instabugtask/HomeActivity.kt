@@ -1,24 +1,31 @@
 package com.ashehata.instabugtask
 
+import android.app.Dialog
+import android.app.ProgressDialog
 import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
-import com.ashehata.instabugtask.models.HttpErrorType
-import com.ashehata.instabugtask.models.RequestModel
-import com.ashehata.instabugtask.models.RequestType
 import com.ashehata.instabugtask.util.makeApiCall
-import java.util.concurrent.Executor
-import java.util.concurrent.Executors
 import android.net.ConnectivityManager
+import com.ashehata.instabugtask.models.*
+import com.ashehata.instabugtask.util.isValidURL
+import java.util.concurrent.*
 
 
 class HomeActivity : AppCompatActivity() {
 
 
+    companion object {
+        const val RESPONSE_KEY = "response"
+    }
+
+    private lateinit var runnable: Runnable
     private lateinit var typeGroup: RadioGroup
     private lateinit var getRadio: RadioButton
     private lateinit var postRadio: RadioButton
@@ -31,11 +38,13 @@ class HomeActivity : AppCompatActivity() {
 
     private lateinit var headersHostLinear: LinearLayout
     private lateinit var queriesHostLinear: LinearLayout
+    private lateinit var linear_request_body: LinearLayout
 
     private lateinit var headersViewsList: MutableList<View>
     private lateinit var queriesViewsList: MutableList<View>
 
-    private lateinit var executor: Executor
+    private lateinit var executor: ExecutorService
+    private lateinit var progress: ProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +56,22 @@ class HomeActivity : AppCompatActivity() {
         onAddHeader()
         onAddQuery()
         onSendClick()
+        onRequestTypeSelected()
+    }
+
+    private fun onRequestTypeSelected() {
+        typeGroup.setOnCheckedChangeListener { radioGroup, i ->
+            when (i) {
+                R.id.rb_get -> {
+                    queriesHostLinear.visibility = View.VISIBLE
+                    linear_request_body.visibility = View.GONE
+                }
+                R.id.rb_post -> {
+                    queriesHostLinear.visibility = View.GONE
+                    linear_request_body.visibility = View.VISIBLE
+                }
+            }
+        }
     }
 
     private fun initLists() {
@@ -120,7 +145,7 @@ class HomeActivity : AppCompatActivity() {
         sendButton.setOnClickListener {
             // validate url and type request
 
-            /*if (!urlEt.text.toString().isValidURL()) {
+            if (!urlEt.text.toString().isValidURL()) {
                 Toast.makeText(this, getString(R.string.empty_url), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -130,27 +155,28 @@ class HomeActivity : AppCompatActivity() {
                     .show()
                 return@setOnClickListener
             }
-            // collect headers data
-            val headersMap = collectHeadersData()
-            headersMap.map {
-                val header = KeyValue(it.key, it.value)
-                Toast.makeText(this, header.all(), Toast.LENGTH_SHORT).show()
-            }
 
-            // collect quires data
-            val queriesMap = collectQueriesData()
-            queriesMap.map {
-                val header = KeyValue(it.key, it.value)
-                Toast.makeText(this, header.all(), Toast.LENGTH_SHORT).show()
-            }
-            val requestBody = requestBody.text.toString().trim()*/
+            val requestBody = requestBody.text.toString().trim()
 
+            val requestType = when (typeGroup.checkedRadioButtonId) {
+                R.id.rb_get -> {
+                    RequestType.GET
+                }
+                R.id.rb_post -> {
+                    RequestType.POST
+                }
+                else -> RequestType.NONE
+            }
             // after that try to get data
+            val headersList = collectHeadersData()
+            val quries = collectQueriesData()
+
             val mRequestModel = RequestModel(
-                // https://cat-fact.herokuapp.com/facts
                 url = "https://dog.ceo/api/breeds/image/random",
-                requestType = RequestType.GET,
-                requestBody = ""
+                requestType = requestType,
+                requestBody = requestBody,
+                headers = headersList,
+                queryParameters = quries
             )
             getApiData(mRequestModel)
 
@@ -159,40 +185,51 @@ class HomeActivity : AppCompatActivity() {
 
     private fun getApiData(mRequestModel: RequestModel) {
         if (isNetworkConnected()) {
-
-
+            showLoadingDialog()
             executor.execute {
                 makeApiCall(
                     requestModel = mRequestModel,
-                    onSuccess = {
+                    onResponse = { responseModel ->
+                        hideDialog()
                         runOnUiThread {
-                            Toast.makeText(this, it.responseBody.toString(), Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                    },
-                    onFailure = {
-                        runOnUiThread {
-                            val message = when (it.error) {
-                                HttpErrorType.BadGateway -> "Bad geteway"
-                                HttpErrorType.BadRequest -> "BadRequest"
-                                HttpErrorType.DataInvalid -> "DataInvalid"
-                                HttpErrorType.Forbidden -> "Forbidden "
-                                HttpErrorType.InternalServerError -> "InternalServerError "
-                                HttpErrorType.NotAuthorized -> "NotAuthorized "
-                                HttpErrorType.NotFound -> "NotFound "
-                                HttpErrorType.Unknown -> "Unknown "
-                                null -> "Null"
-                                else -> "Error"
+                            if (responseModel.errorMessage != null) {
+                                Toast.makeText(this, responseModel.errorMessage, Toast.LENGTH_SHORT)
+                                    .show()
                             }
-                            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                            openResultScreen(responseModel)
                         }
                     }
                 )
             }
         } else {
             Toast.makeText(this, "No internet", Toast.LENGTH_SHORT).show()
-
         }
+    }
+
+    private fun hideDialog() {
+        runOnUiThread {
+            progress.hide()
+        }
+    }
+
+    private fun showLoadingDialog() {
+        progress = ProgressDialog(this)
+        progress.apply {
+            setMessage("loading")
+            setButton(Dialog.BUTTON_NEGATIVE, getString(R.string.cancel)) { dialogInterface, i ->
+                //runnable.
+            }
+            setCancelable(false)
+            show()
+        }
+    }
+
+    private fun openResultScreen(responseModel: ResponseModel) {
+        startActivity(
+            Intent(this, ResultActivity::class.java).apply {
+                putExtra(RESPONSE_KEY, responseModel)
+            }
+        )
     }
 
     private fun isNetworkConnected(): Boolean {
@@ -200,7 +237,7 @@ class HomeActivity : AppCompatActivity() {
         return cm.activeNetworkInfo != null && cm.activeNetworkInfo!!.isConnected
     }
 
-    private fun collectHeadersData(): MutableMap<String, String> {
+    private fun collectHeadersData(): List<KeyValue> {
         val headers = mutableMapOf<String, String>()
         headersViewsList.map {
             val linearView = it as LinearLayout
@@ -208,19 +245,26 @@ class HomeActivity : AppCompatActivity() {
             val value = (linearView.getChildAt(1) as EditText).text.toString()
             headers.put(key, value)
         }
-        return headers
+
+        return headers.map {
+            return@map KeyValue(it.key, it.value)
+        }.filter { return@filter !(it.key.isNullOrEmpty() && it.value.isNullOrEmpty()) }
+            .toList()
     }
 
 
-    private fun collectQueriesData(): MutableMap<String, String> {
-        val headers = mutableMapOf<String, String>()
+    private fun collectQueriesData(): List<KeyValue> {
+        val quries = mutableMapOf<String, String>()
         queriesViewsList.map {
             val linearView = it as LinearLayout
             val key = (linearView.getChildAt(0) as EditText).text.toString()
             val value = (linearView.getChildAt(1) as EditText).text.toString()
-            headers.put(key, value)
+            quries.put(key, value)
         }
-        return headers
+        return quries.map {
+            return@map KeyValue(it.key, it.value)
+        }.filter { return@filter !(it.key.isNullOrEmpty() && it.value.isNullOrEmpty()) }
+            .toList()
     }
 
     private fun initViews() {
@@ -236,9 +280,14 @@ class HomeActivity : AppCompatActivity() {
 
         headersHostLinear = findViewById(R.id.linear_headers_parent_host)
         queriesHostLinear = findViewById(R.id.linear_queries_parent_host)
+        linear_request_body = findViewById(R.id.linear_request_body)
     }
 
     override fun onDestroy() {
+        // prevent memory leaks !!
+        if (!executor.isShutdown) {
+            executor.shutdown()
+        }
         super.onDestroy()
     }
 }

@@ -1,8 +1,7 @@
 package com.ashehata.instabugtask.util
 
-import com.ashehata.instabugtask.models.HttpErrorType
-import com.ashehata.instabugtask.models.RequestModel
-import com.ashehata.instabugtask.models.ResponseModel
+import android.util.Log
+import com.ashehata.instabugtask.models.*
 import java.io.*
 import java.lang.Exception
 import java.lang.StringBuilder
@@ -14,27 +13,39 @@ import java.net.URL
  */
 fun makeApiCall(
     requestModel: RequestModel,
-    onSuccess: (ResponseModel) -> Unit,
-    onFailure: (ResponseModel) -> Unit,
+    onResponse: (ResponseModel) -> Unit,
 ) {
-
-    val url = URL(requestModel.url);
-    val httpURLConnection = url.openConnection() as HttpURLConnection
-
-    // setting the  Request Method Type
-    //OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, PATCH
-    httpURLConnection.requestMethod = requestModel.requestType.name
-
-    // adding the headers for request
-    //httpURLConnection.setRequestProperty("Content-Type", "application/json")
-   /* httpURLConnection.setRequestProperty("Connection", "keep-alive")
-    //httpURLConnection.setRequestProperty("charset", "utf-8")*/
-
-
+    var httpURLConnection: HttpURLConnection? = null
     try {
-        val responseCode = httpURLConnection.responseCode
+        var myUrl = ""
+        if (requestModel.requestType == RequestType.GET) {
 
-        val responseErrorType = when(responseCode) {
+            if (requestModel.queryParameters.isNotEmpty()) {
+                val query = StringBuilder()
+                query.append("?")
+                requestModel.headers.forEach {
+                    query.append(it.key + "=" + it.value)
+                }
+                myUrl = requestModel.url + query.toString()
+            } else {
+                requestModel.url
+            }
+        }
+        val url = URL(myUrl)
+        httpURLConnection = url.openConnection() as HttpURLConnection
+
+        // setting the  Request Method Type
+        //OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, PATCH
+        httpURLConnection.requestMethod = requestModel.requestType.name
+
+        requestModel.headers.forEach {
+            httpURLConnection.setRequestProperty(it.key, it.value)
+        }
+
+        val responseCode = httpURLConnection.responseCode
+        Log.i("makeApiCall: ", responseCode.toString())
+
+        val responseErrorType = when (responseCode) {
             200 -> HttpErrorType.None
             400 -> HttpErrorType.BadRequest
             401 -> HttpErrorType.NotAuthorized
@@ -45,6 +56,9 @@ fun makeApiCall(
             502 -> HttpErrorType.BadGateway
             else -> HttpErrorType.Unknown
         }
+        Log.i("makeApiCall: size", httpURLConnection.headerFields.size.toString())
+        val responseHeaders = getResponseHeaders(httpURLConnection.headerFields)
+
 
         val input: InputStream = BufferedInputStream(httpURLConnection.inputStream)
         val reader = BufferedReader(InputStreamReader(input))
@@ -54,24 +68,27 @@ fun makeApiCall(
             result.append(line)
         }
 
-        when(responseErrorType) {
+        val finalRes = result.toString().replace("\\", "")
+        when (responseErrorType) {
             HttpErrorType.None -> {
                 // after response code of your request
-                onSuccess(
+                onResponse(
                     ResponseModel(
+                        headers = responseHeaders,
                         requestModel = requestModel,
                         responseCode = responseCode,
-                        responseBody = result.toString(),
-                        error = null,
+                        responseBody = finalRes + finalRes + finalRes,
+                        error = HttpErrorType.None,
                     )
                 )
             }
             else -> {
-                onFailure(
+                onResponse(
                     ResponseModel(
+                        headers = responseHeaders,
                         requestModel = requestModel,
                         responseCode = httpURLConnection.responseCode,
-                        responseBody = httpURLConnection.responseMessage,
+                        responseBody = result.toString(),
                         error = responseErrorType,
                     )
                 )
@@ -80,18 +97,27 @@ fun makeApiCall(
 
 
     } catch (e: Exception) {
-        onFailure(
+
+        onResponse(
             ResponseModel(
+                //headers = responseHeaders,
                 requestModel = requestModel,
-                responseCode = httpURLConnection.responseCode,
-                responseBody = httpURLConnection.responseMessage,
+                responseCode = httpURLConnection?.responseCode ?: -1,
+                responseBody = httpURLConnection?.responseMessage.toString(),
                 // todo get the correct error
                 error = HttpErrorType.InternalServerError,
+                errorMessage = e.message
             )
         )
     } finally {
-        httpURLConnection.disconnect()
+        httpURLConnection?.disconnect()
     }
 
 
+}
+
+fun getResponseHeaders(headerFields: Map<String, MutableList<String>>): List<KeyValue> {
+    return headerFields.map {
+        return@map KeyValue(it.key ?: "", it.value.first())
+    }.toList()
 }

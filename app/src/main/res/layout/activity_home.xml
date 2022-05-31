@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
+    android:animateLayoutChanges="true"
     tools:context=".HomeActivity">
 
     <ScrollView
@@ -114,6 +115,8 @@
             </LinearLayout>
 
             <LinearLayout
+                android:visibility="gone"
+                tools:visibility="visible"
                 android:id="@+id/linear_queries_parent_host"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -146,6 +149,9 @@
             </LinearLayout>
 
             <LinearLayout
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:id="@+id/linear_request_body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"

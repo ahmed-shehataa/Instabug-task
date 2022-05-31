@@ -12,4 +12,8 @@
     <string name="send">send</string>
     <string name="empty_url">Insert a URL</string>
     <string name="empty_request_type">choose a request type</string>
+    <string name="response_code">Response Code</string>
+    <string name="error">Error</string>
+    <string name="response_body">Response body</string>
+    <string name="cancel">Cancel</string>
 </resources>

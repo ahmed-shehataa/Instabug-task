@@ -15,6 +15,9 @@
         android:theme="@style/Theme.InstabugTask"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".ResultActivity"
+            android:exported="false" />
+        <activity
             android:name=".HomeActivity"
             android:exported="true"
             android:windowSoftInputMode="stateHidden">
