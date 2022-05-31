@@ -1,5 +1,13 @@
 # Instabug-task
 ### App screenshots
+<p float="left">
+  <img src="img/app1.png" height="350" width="200">
+  <img src="img/app2.png" height="350" width="200">
+  <img src="img/app3.png" height="350" width="200">
+  <img src="img/app4.png" height="350" width="200">
+  <img src="img/app5.png" height="350" width="200">
+
+</p>
 
 ### Requriments:
 We need you to create an application that will help in testing backed APIs.
