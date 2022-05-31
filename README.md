@@ -1,14 +1,15 @@
 # Instabug-task
 ### App screenshots
 <p float="left">
-  <img src="img/app1.png" height="350" width="200">
-  <img src="img/app2.png" height="350" width="200">
-  <img src="img/app3.png" height="350" width="200">
-  <img src="img/app4.png" height="350" width="200">
-  <img src="img/app5.png" height="350" width="200">
-
+  <img src="img/app1.png" height="400" width="200">
+  <img src="img/app4.png" height="400" width="200">
+  <img src="img/app5.png" height="400" width="200">
+  <img src="img/app6.png" height="400" width="200">
 </p>
 
+
+### APK Download:
+[Click here](https://soundcloud.com/discover)
 ### Requriments:
 We need you to create an application that will help in testing backed APIs.
 This application must allow us to do the following:
@@ -37,3 +38,11 @@ Without using List view or Recycler view.
 We validate the  following befor making any API call      
 URL using -> REGEX     
 Request type (GET / POST) 
+
+### For background tasks:
+used: [Executers](https://developer.android.com/reference/java/util/concurrent/Executors)
+
+### For Network Calls:
+used: [HttpURLConnection](https://developer.android.com/reference/java/net/HttpURLConnection)
+
+
