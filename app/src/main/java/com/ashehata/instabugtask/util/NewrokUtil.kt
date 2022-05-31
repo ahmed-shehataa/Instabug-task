@@ -17,9 +17,8 @@ fun makeApiCall(
 ) {
     var httpURLConnection: HttpURLConnection? = null
     try {
-        var myUrl = ""
+        var myUrl = requestModel.url
         if (requestModel.requestType == RequestType.GET) {
-
             if (requestModel.queryParameters.isNotEmpty()) {
                 val query = StringBuilder()
                 query.append("?")
@@ -27,10 +26,9 @@ fun makeApiCall(
                     query.append(it.key + "=" + it.value)
                 }
                 myUrl = requestModel.url + query.toString()
-            } else {
-                requestModel.url
             }
         }
+
         val url = URL(myUrl)
         httpURLConnection = url.openConnection() as HttpURLConnection
 

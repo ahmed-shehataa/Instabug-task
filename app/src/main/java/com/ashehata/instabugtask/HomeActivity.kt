@@ -145,7 +145,7 @@ class HomeActivity : AppCompatActivity() {
         sendButton.setOnClickListener {
             // validate url and type request
 
-            if (!urlEt.text.toString().isValidURL()) {
+           /* if (!urlEt.text.toString().isValidURL()) {
                 Toast.makeText(this, getString(R.string.empty_url), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -166,15 +166,15 @@ class HomeActivity : AppCompatActivity() {
                     RequestType.POST
                 }
                 else -> RequestType.NONE
-            }
+            }*/
             // after that try to get data
             val headersList = collectHeadersData()
             val quries = collectQueriesData()
 
             val mRequestModel = RequestModel(
                 url = "https://dog.ceo/api/breeds/image/random",
-                requestType = requestType,
-                requestBody = requestBody,
+                requestType = RequestType.GET,
+                requestBody = "requestBody",
                 headers = headersList,
                 queryParameters = quries
             )
