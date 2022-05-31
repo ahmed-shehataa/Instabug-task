@@ -1,6 +1,6 @@
 # Instabug-task
 ### App screenshots
-<p float="left">
+<p align="center">
   <img src="img/app1.png" height="400" width="200">
   <img src="img/app4.png" height="400" width="200">
   <img src="img/app5.png" height="400" width="200">
@@ -45,4 +45,6 @@ used: [Executers](https://developer.android.com/reference/java/util/concurrent/E
 ### For Network Calls:
 used: [HttpURLConnection](https://developer.android.com/reference/java/net/HttpURLConnection)
 
+### Endpoints for test:
+[Daily cat facts](https://alexwohlbruck.github.io/cat-facts/docs/)
 
