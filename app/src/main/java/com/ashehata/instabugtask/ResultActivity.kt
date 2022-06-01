@@ -6,7 +6,6 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import com.ashehata.instabugtask.dialogs.showHeadersDialog
 import com.ashehata.instabugtask.dialogs.showQueryDialog
 import com.ashehata.instabugtask.models.HttpErrorType
@@ -22,12 +21,11 @@ class ResultActivity : AppCompatActivity() {
      */
     private lateinit var tvCode: TextView
     private lateinit var tvError: TextView
-
     private lateinit var ivHeaders: ImageView
     private lateinit var ivQquery: ImageView
     private lateinit var linearQuery: LinearLayout
     private lateinit var linearRequestBody: LinearLayout
-
+    private lateinit var linear_header_display: LinearLayout
     private lateinit var tvRequestBody: TextView
     private lateinit var tvResponseBody: TextView
 
@@ -36,10 +34,11 @@ class ResultActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_result)
 
+        // get the responseModel from thrown intent extra
         responseModel = intent.getSerializableExtra(HomeActivity.RESPONSE_KEY) as ResponseModel
+
         initViews()
         displayResponseData()
-
         onDisplayHeaders()
         onDisplayQuery()
     }
@@ -57,24 +56,20 @@ class ResultActivity : AppCompatActivity() {
         ivHeaders.setOnClickListener {
             val responseHeaders = responseModel.headers
             val requestHeaders = responseModel.requestModel?.headers
-            if (responseHeaders != null) {
-                showHeadersDialog(responseHeaders, requestHeaders)
-            }
+            showHeadersDialog(responseHeaders, requestHeaders)
         }
     }
 
     private fun initViews() {
         tvCode = findViewById(R.id.tv_code)
         tvError = findViewById(R.id.tv_error)
-
         ivHeaders = findViewById(R.id.iv_display_headers)
         ivQquery = findViewById(R.id.iv_display_query)
         linearQuery = findViewById(R.id.linear_query_parameters)
         linearRequestBody = findViewById(R.id.linear_request_body)
-
+        linear_header_display = findViewById(R.id.linear_header_display)
         tvRequestBody = findViewById(R.id.tv_request_body)
         tvResponseBody = findViewById(R.id.tv_response_body)
-
 
     }
 
@@ -91,8 +86,12 @@ class ResultActivity : AppCompatActivity() {
             tvResponseBody.text = responseBody
         }
 
-        if (responseModel.requestModel?.queryParameters.isNullOrEmpty()) {
-            linearQuery.visibility = View.GONE
+        if (responseModel.requestModel?.requestBody.isNullOrEmpty()) {
+            linearRequestBody.visibility = View.GONE
+        }
+
+        if (responseModel.requestModel?.headers.isNullOrEmpty()) {
+            linear_header_display.visibility = View.GONE
         }
 
         when (responseModel.requestModel?.requestType) {
@@ -103,6 +102,7 @@ class ResultActivity : AppCompatActivity() {
                 linearQuery.visibility = View.GONE
             }
             null -> {}
+            RequestType.NONE -> {}
         }
     }
 

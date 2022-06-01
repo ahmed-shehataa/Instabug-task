@@ -57,6 +57,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/linear_header_display"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"

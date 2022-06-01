@@ -12,6 +12,8 @@ import android.widget.*
 import com.ashehata.instabugtask.util.makeApiCall
 import android.net.ConnectivityManager
 import com.ashehata.instabugtask.models.*
+import com.ashehata.instabugtask.util.isNetworkConnected
+import com.ashehata.instabugtask.util.isValidURL
 import java.util.concurrent.*
 
 
@@ -22,36 +24,48 @@ class HomeActivity : AppCompatActivity() {
         const val RESPONSE_KEY = "response"
     }
 
+    /**
+     * define views
+     */
     private lateinit var typeGroup: RadioGroup
     private lateinit var getRadio: RadioButton
     private lateinit var postRadio: RadioButton
     private lateinit var sendButton: Button
     private lateinit var urlEt: EditText
     private lateinit var requestBodyEt: EditText
-
     private lateinit var imageAddHeader: ImageView
     private lateinit var imageAddQuery: ImageView
-
     private lateinit var headersHostLinear: LinearLayout
     private lateinit var queriesHostLinear: LinearLayout
     private lateinit var linear_request_body: LinearLayout
 
+    /**
+     * dynamic headers and query parameters
+     */
     private lateinit var headersViewsList: MutableList<View>
     private lateinit var queriesViewsList: MutableList<View>
 
+    /**
+     * other
+     */
     private lateinit var executor: ExecutorService
     private lateinit var progress: ProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
-
+        // create a new single thread.
         executor = Executors.newSingleThreadExecutor()
+
         initViews()
         initLists()
+        // on plus icon header clicked listener
         onAddHeader()
+        // on plus icon query clicked listener
         onAddQuery()
+        // on send button clicked listener
         onSendClick()
+        // on request type radio buttons checked listener
         onRequestTypeSelected()
     }
 
@@ -108,12 +122,16 @@ class HomeActivity : AppCompatActivity() {
 
     private fun onAddHeader() {
         imageAddHeader.setOnClickListener {
+            // try inflate header item from layouts
             val view = LayoutInflater.from(this)
                 .inflate(R.layout.key_value_item, headersHostLinear, false)
 
             view.tag = headersViewsList.size.toString()
             Log.i("onAddHeader: Counter", headersViewsList.size.toString())
 
+            /**
+             * on remove header cliciked
+             */
             view.findViewById<ImageView>(R.id.iv_remove_item).setOnClickListener {
                 // try to remove the header
                 if (headersViewsList.size != 0) {
@@ -125,13 +143,14 @@ class HomeActivity : AppCompatActivity() {
                         return@find it.tag.toString().toInt() == viewTag
                     }
                     Log.i("onAddHeader: find", deletedView?.tag.toString())
-                    //Toast.makeText(this, deletedView?.tag.toString(), Toast.LENGTH_SHORT).show()
 
+                    // remove header view from list and view hierarchy
                     headersHostLinear.removeView(deletedView)
                     headersViewsList.remove(deletedView)
 
                 }
             }
+            // add header view to list and view hierarchy
             headersHostLinear.addView(view)
             headersViewsList.add(view)
         }
@@ -140,8 +159,7 @@ class HomeActivity : AppCompatActivity() {
     private fun onSendClick() {
         sendButton.setOnClickListener {
             // validate url and type request
-
-           /* if (!urlEt.text.toString().isValidURL()) {
+            if (!urlEt.text.toString().isValidURL()) {
                 Toast.makeText(this, getString(R.string.empty_url), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -152,7 +170,10 @@ class HomeActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val requestBody = requestBody.text.toString().trim()
+
+            // collect user inserted data
+            val url = urlEt.text.toString().trim()
+            val requestBody = requestBodyEt.text.toString().trim()
 
             val requestType = when (typeGroup.checkedRadioButtonId) {
                 R.id.rb_get -> {
@@ -162,20 +183,17 @@ class HomeActivity : AppCompatActivity() {
                     RequestType.POST
                 }
                 else -> RequestType.NONE
-            }*/
-            // after that try to get data
-            requestBodyEt.setText("{\"name\": \"Upendra\", \"job\": \"Programmer\"}")
-            urlEt.setText("https://reqres.in/api/users")
+            }
+            /* // after that try to get data
+             requestBodyEt.setText("{\"name\": \"Upendra\", \"job\": \"Programmer\"}")
+             urlEt.setText("https://reqres.in/api/users")*/
 
             val headersList = collectHeadersData()
             val queries = collectQueriesData()
-            val requestBody = requestBodyEt.text.toString().trim()
-            val url = urlEt.text.toString().trim()
-
 
             val mRequestModel = RequestModel(
                 url = url,
-                requestType = RequestType.GET,
+                requestType = requestType,
                 requestBody = requestBody,
                 headers = headersList,
                 queryParameters = queries
@@ -204,7 +222,7 @@ class HomeActivity : AppCompatActivity() {
                 )
             }
         } else {
-            Toast.makeText(this, "No internet", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "No internet connection", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -229,11 +247,6 @@ class HomeActivity : AppCompatActivity() {
                 putExtra(RESPONSE_KEY, responseModel)
             }
         )
-    }
-
-    private fun isNetworkConnected(): Boolean {
-        val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        return cm.activeNetworkInfo != null && cm.activeNetworkInfo!!.isConnected
     }
 
     private fun collectHeadersData(): List<KeyValue> {
@@ -273,10 +286,8 @@ class HomeActivity : AppCompatActivity() {
         postRadio = findViewById(R.id.rb_post)
         urlEt = findViewById(R.id.et_url)
         requestBodyEt = findViewById(R.id.et_request_body)
-
         imageAddHeader = findViewById(R.id.iv_add_header)
         imageAddQuery = findViewById(R.id.iv_add_query)
-
         headersHostLinear = findViewById(R.id.linear_headers_parent_host)
         queriesHostLinear = findViewById(R.id.linear_queries_parent_host)
         linear_request_body = findViewById(R.id.linear_request_body)

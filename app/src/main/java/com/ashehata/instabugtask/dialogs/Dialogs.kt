@@ -7,7 +7,7 @@ import com.ashehata.instabugtask.models.KeyValue
 import java.lang.StringBuilder
 
 
-fun Context.showHeadersDialog(responseHeaders: List<KeyValue>, requestHeaders: List<KeyValue>?) {
+fun Context.showHeadersDialog(responseHeaders: List<KeyValue>?, requestHeaders: List<KeyValue>?) {
     val dialog = AlertDialog.Builder(this)
     dialog.setTitle(getString(R.string.headers))
     dialog.setMessage(getHeadersOrganized(responseHeaders, requestHeaders))
@@ -58,7 +58,7 @@ fun getQueriesOrganized(queries: List<KeyValue>): String {
     return result.toString()
 }
 
-fun getHeadersOrganized(responseHeaders: List<KeyValue>, requestHeaders: List<KeyValue>?): String {
+fun getHeadersOrganized(responseHeaders: List<KeyValue>?, requestHeaders: List<KeyValue>?): String {
     val result  = StringBuilder()
     result.append("Request Headers: \n \n")
 
@@ -75,7 +75,7 @@ fun getHeadersOrganized(responseHeaders: List<KeyValue>, requestHeaders: List<Ke
 
     result.append("Response Headers: \n \n")
 
-    responseHeaders.forEach {
+    responseHeaders?.forEach {
         if (it.key.isNullOrEmpty()) {
             result.append(it.value)
         } else {
