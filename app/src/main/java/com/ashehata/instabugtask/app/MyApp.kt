@@ -1,4 +1,4 @@
-package com.ashehata.instabugtask
+package com.ashehata.instabugtask.app
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate

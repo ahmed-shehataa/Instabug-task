@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-        android:name=".MyApp"
+        android:name=".app.MyApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -16,10 +16,11 @@
         android:theme="@style/Theme.InstabugTask"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".ResultActivity"
+            android:launchMode="singleTop"
+            android:name=".result.ResultActivity"
             android:exported="false" />
         <activity
-            android:name=".HomeActivity"
+            android:name=".home.HomeActivity"
             android:exported="true"
             android:windowSoftInputMode="stateHidden">
             <intent-filter>

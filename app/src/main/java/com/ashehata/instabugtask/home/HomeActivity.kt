@@ -1,7 +1,6 @@
-package com.ashehata.instabugtask
+package com.ashehata.instabugtask.home
 
 import android.app.ProgressDialog
-import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -9,11 +8,17 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
+import androidx.activity.viewModels
+import androidx.lifecycle.Observer
 import com.ashehata.instabugtask.util.makeApiCall
-import android.net.ConnectivityManager
+import com.ashehata.instabugtask.R
+import com.ashehata.instabugtask.databinding.ActivityHomeBinding
+import com.ashehata.instabugtask.result.ResultActivity
 import com.ashehata.instabugtask.models.*
+import com.ashehata.instabugtask.util.LogMe
 import com.ashehata.instabugtask.util.isNetworkConnected
 import com.ashehata.instabugtask.util.isValidURL
+import java.lang.Exception
 import java.util.concurrent.*
 
 
@@ -25,21 +30,6 @@ class HomeActivity : AppCompatActivity() {
     }
 
     /**
-     * define views
-     */
-    private lateinit var typeGroup: RadioGroup
-    private lateinit var getRadio: RadioButton
-    private lateinit var postRadio: RadioButton
-    private lateinit var sendButton: Button
-    private lateinit var urlEt: EditText
-    private lateinit var requestBodyEt: EditText
-    private lateinit var imageAddHeader: ImageView
-    private lateinit var imageAddQuery: ImageView
-    private lateinit var headersHostLinear: LinearLayout
-    private lateinit var queriesHostLinear: LinearLayout
-    private lateinit var linear_request_body: LinearLayout
-
-    /**
      * dynamic headers and query parameters
      */
     private lateinit var headersViewsList: MutableList<View>
@@ -48,16 +38,17 @@ class HomeActivity : AppCompatActivity() {
     /**
      * other
      */
-    private lateinit var executor: ExecutorService
-    private lateinit var progress: ProgressDialog
+
+    private val viewModel: HomeViewModel by viewModels()
+    private lateinit var binding: ActivityHomeBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home)
-        // create a new single thread.
-        executor = Executors.newSingleThreadExecutor()
+        binding = ActivityHomeBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
-        initViews()
+        listenToChanges()
         initLists()
         // on plus icon header clicked listener
         onAddHeader()
@@ -67,18 +58,54 @@ class HomeActivity : AppCompatActivity() {
         onSendClick()
         // on request type radio buttons checked listener
         onRequestTypeSelected()
+
+    }
+
+    private fun listenToChanges() {
+        viewModel.stateLiveData.observe(this, Observer {
+            if (it.isSuccess && it.responseModel != null) {
+                sendClearIntent()
+                openResultScreen(it.responseModel)
+            }
+
+            if (it.isLoading) {
+                binding.pbLoading.visibility = View.VISIBLE
+                binding.btnSend.isEnabled = false
+            } else {
+                binding.btnSend.isEnabled = true
+                binding.pbLoading.visibility = View.GONE
+            }
+
+            if (it.isUrlValid != null) {
+                if (!it.isUrlValid) {
+                    Toast.makeText(this, getString(R.string.empty_url), Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+
+            if (it.isRequestTypeValid != null) {
+                if (!it.isRequestTypeValid) {
+                    Toast.makeText(this, getString(R.string.empty_request_type), Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+        })
+    }
+
+    private fun sendClearIntent() {
+        viewModel.intentLiveData.value = HomeIntent.Clear
     }
 
     private fun onRequestTypeSelected() {
-        typeGroup.setOnCheckedChangeListener { radioGroup, i ->
+        binding.typeGroup.setOnCheckedChangeListener { radioGroup, i ->
             when (i) {
                 R.id.rb_get -> {
-                    queriesHostLinear.visibility = View.VISIBLE
-                    linear_request_body.visibility = View.GONE
+                    binding.linearQueriesParentHost.visibility = View.VISIBLE
+                    binding.linearRequestBody.visibility = View.GONE
                 }
                 R.id.rb_post -> {
-                    queriesHostLinear.visibility = View.GONE
-                    linear_request_body.visibility = View.VISIBLE
+                    binding.linearQueriesParentHost.visibility = View.GONE
+                    binding.linearRequestBody.visibility = View.VISIBLE
                 }
             }
         }
@@ -90,9 +117,9 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun onAddQuery() {
-        imageAddQuery.setOnClickListener {
+        binding.ivAddQuery.setOnClickListener {
             val view = LayoutInflater.from(this)
-                .inflate(R.layout.key_value_item, queriesHostLinear, false)
+                .inflate(R.layout.key_value_item, binding.linearQueriesParentHost, false)
 
             view.tag = queriesViewsList.size.toString()
             Log.i("onAddHeader: Counter", queriesViewsList.size.toString())
@@ -110,21 +137,21 @@ class HomeActivity : AppCompatActivity() {
                     Log.i("onAddHeader: find", deletedView?.tag.toString())
                     //Toast.makeText(this, deletedView?.tag.toString(), Toast.LENGTH_SHORT).show()
 
-                    queriesHostLinear.removeView(deletedView)
+                    binding.linearQueriesParentHost.removeView(deletedView)
                     queriesViewsList.remove(deletedView)
 
                 }
             }
-            queriesHostLinear.addView(view)
+            binding.linearQueriesParentHost.addView(view)
             queriesViewsList.add(view)
         }
     }
 
     private fun onAddHeader() {
-        imageAddHeader.setOnClickListener {
+        binding.ivAddHeader.setOnClickListener {
             // try inflate header item from layouts
             val view = LayoutInflater.from(this)
-                .inflate(R.layout.key_value_item, headersHostLinear, false)
+                .inflate(R.layout.key_value_item, binding.linearHeadersParentHost, false)
 
             view.tag = headersViewsList.size.toString()
             Log.i("onAddHeader: Counter", headersViewsList.size.toString())
@@ -145,37 +172,24 @@ class HomeActivity : AppCompatActivity() {
                     Log.i("onAddHeader: find", deletedView?.tag.toString())
 
                     // remove header view from list and view hierarchy
-                    headersHostLinear.removeView(deletedView)
+                    binding.linearHeadersParentHost.removeView(deletedView)
                     headersViewsList.remove(deletedView)
 
                 }
             }
             // add header view to list and view hierarchy
-            headersHostLinear.addView(view)
+            binding.linearHeadersParentHost.addView(view)
             headersViewsList.add(view)
         }
     }
 
     private fun onSendClick() {
-        sendButton.setOnClickListener {
-            // validate url and type request
-            if (!urlEt.text.toString().isValidURL()) {
-                Toast.makeText(this, getString(R.string.empty_url), Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            if (typeGroup.checkedRadioButtonId == -1) {
-                Toast.makeText(this, getString(R.string.empty_request_type), Toast.LENGTH_SHORT)
-                    .show()
-                return@setOnClickListener
-            }
-
-
+        binding.btnSend.setOnClickListener {
             // collect user inserted data
-            val url = urlEt.text.toString().trim()
-            val requestBody = requestBodyEt.text.toString().trim()
+            val url = binding.etUrl.text.toString().trim()
+            val requestBody = binding.etRequestBody.text.toString().trim()
 
-            val requestType = when (typeGroup.checkedRadioButtonId) {
+            val requestType = when (binding.typeGroup.checkedRadioButtonId) {
                 R.id.rb_get -> {
                     RequestType.GET
                 }
@@ -198,47 +212,14 @@ class HomeActivity : AppCompatActivity() {
                 headers = headersList,
                 queryParameters = queries
             )
-            getApiData(mRequestModel)
+            LogMe.i("sendGetDataIntent", "called")
+            sendGetDataIntent(mRequestModel)
 
         }
     }
 
-    private fun getApiData(mRequestModel: RequestModel) {
-        if (isNetworkConnected()) {
-            showLoadingDialog()
-            executor.execute {
-                makeApiCall(
-                    requestModel = mRequestModel,
-                    onResponse = { responseModel ->
-                        hideDialog()
-                        runOnUiThread {
-                            if (responseModel.errorMessage != null) {
-                                Toast.makeText(this, responseModel.errorMessage, Toast.LENGTH_SHORT)
-                                    .show()
-                            }
-                            openResultScreen(responseModel)
-                        }
-                    }
-                )
-            }
-        } else {
-            Toast.makeText(this, "No internet connection", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun hideDialog() {
-        runOnUiThread {
-            progress.hide()
-        }
-    }
-
-    private fun showLoadingDialog() {
-        progress = ProgressDialog(this)
-        progress.apply {
-            setMessage("Sending request")
-            setCancelable(false)
-            show()
-        }
+    private fun sendGetDataIntent(mRequestModel: RequestModel) {
+        viewModel.intentLiveData.value = HomeIntent.GetResponse(mRequestModel)
     }
 
     private fun openResultScreen(responseModel: ResponseModel) {
@@ -264,7 +245,6 @@ class HomeActivity : AppCompatActivity() {
             .toList()
     }
 
-
     private fun collectQueriesData(): List<KeyValue> {
         val quries = mutableMapOf<String, String>()
         queriesViewsList.map {
@@ -277,27 +257,5 @@ class HomeActivity : AppCompatActivity() {
             return@map KeyValue(it.key, it.value)
         }.filter { return@filter !(it.key.isNullOrEmpty() && it.value.isNullOrEmpty()) }
             .toList()
-    }
-
-    private fun initViews() {
-        sendButton = findViewById(R.id.btn_send)
-        typeGroup = findViewById(R.id.type_group)
-        getRadio = findViewById(R.id.rb_get)
-        postRadio = findViewById(R.id.rb_post)
-        urlEt = findViewById(R.id.et_url)
-        requestBodyEt = findViewById(R.id.et_request_body)
-        imageAddHeader = findViewById(R.id.iv_add_header)
-        imageAddQuery = findViewById(R.id.iv_add_query)
-        headersHostLinear = findViewById(R.id.linear_headers_parent_host)
-        queriesHostLinear = findViewById(R.id.linear_queries_parent_host)
-        linear_request_body = findViewById(R.id.linear_request_body)
-    }
-
-    override fun onDestroy() {
-        // prevent memory leaks !!
-        if (!executor.isShutdown) {
-            executor.shutdown()
-        }
-        super.onDestroy()
     }
 }

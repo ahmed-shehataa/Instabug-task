@@ -1,4 +1,4 @@
-package com.ashehata.instabugtask
+package com.ashehata.instabugtask.result
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -6,8 +6,10 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.ashehata.instabugtask.R
 import com.ashehata.instabugtask.dialogs.showHeadersDialog
 import com.ashehata.instabugtask.dialogs.showQueryDialog
+import com.ashehata.instabugtask.home.HomeActivity
 import com.ashehata.instabugtask.models.HttpErrorType
 import com.ashehata.instabugtask.models.RequestType
 import com.ashehata.instabugtask.models.ResponseModel
@@ -90,8 +92,8 @@ class ResultActivity : AppCompatActivity() {
             linearRequestBody.visibility = View.GONE
         }
 
-        if (responseModel.requestModel?.headers.isNullOrEmpty()) {
-            linear_header_display.visibility = View.GONE
+        if (responseModel.requestModel?.queryParameters.isNullOrEmpty()) {
+            linearQuery.visibility = View.GONE
         }
 
         when (responseModel.requestModel?.requestType) {
