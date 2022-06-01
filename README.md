@@ -9,12 +9,6 @@
   <img src="img/app6.png" height="400" width="200">
 </p>
 
-### Some Documented functions
-<p align="center">
-  <img src="img/doc1.png" height="400" width="400">
-  <img src="img/doc2.png" height="400" width="400">
-  <img src="img/doc3.png" height="400" width="400">
-</p>
 
 ### Tools & APIs:
 - Kotlin
@@ -23,10 +17,18 @@
 - Live data
 - I didn't use Dagger hilt for DI as it's considered as 3rd parties.
 
+
+### Some Documented functions
+<p align="center">
+  <img src="img/doc1.png" height="300" width="300">
+  <img src="img/doc2.png" height="300" width="300">
+  <img src="img/doc3.png" height="180" width="600">
+</p>
+
 ### Code Architecture:
 Mvvm, Mvi for Home Activity.
 <p align="left">
-  <img src="img/arch.png" height="200" width="200">
+  <img src="img/arch.png" height="400" width="350">
 </p>
 
 ### APK Download:
