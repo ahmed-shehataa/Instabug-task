@@ -1,9 +1,7 @@
 package com.ashehata.instabugtask
 
-import android.app.Dialog
 import android.app.ProgressDialog
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -14,7 +12,6 @@ import android.widget.*
 import com.ashehata.instabugtask.util.makeApiCall
 import android.net.ConnectivityManager
 import com.ashehata.instabugtask.models.*
-import com.ashehata.instabugtask.util.isValidURL
 import java.util.concurrent.*
 
 
@@ -25,13 +22,12 @@ class HomeActivity : AppCompatActivity() {
         const val RESPONSE_KEY = "response"
     }
 
-    private lateinit var runnable: Runnable
     private lateinit var typeGroup: RadioGroup
     private lateinit var getRadio: RadioButton
     private lateinit var postRadio: RadioButton
     private lateinit var sendButton: Button
     private lateinit var urlEt: EditText
-    private lateinit var requestBody: EditText
+    private lateinit var requestBodyEt: EditText
 
     private lateinit var imageAddHeader: ImageView
     private lateinit var imageAddQuery: ImageView
@@ -168,15 +164,21 @@ class HomeActivity : AppCompatActivity() {
                 else -> RequestType.NONE
             }*/
             // after that try to get data
+            requestBodyEt.setText("{\"name\": \"Upendra\", \"job\": \"Programmer\"}")
+            urlEt.setText("https://reqres.in/api/users")
+
             val headersList = collectHeadersData()
-            val quries = collectQueriesData()
+            val queries = collectQueriesData()
+            val requestBody = requestBodyEt.text.toString().trim()
+            val url = urlEt.text.toString().trim()
+
 
             val mRequestModel = RequestModel(
-                url = "https://dog.ceo/api/breeds/image/random",
+                url = url,
                 requestType = RequestType.GET,
-                requestBody = "requestBody",
+                requestBody = requestBody,
                 headers = headersList,
-                queryParameters = quries
+                queryParameters = queries
             )
             getApiData(mRequestModel)
 
@@ -215,10 +217,7 @@ class HomeActivity : AppCompatActivity() {
     private fun showLoadingDialog() {
         progress = ProgressDialog(this)
         progress.apply {
-            setMessage("loading")
-            setButton(Dialog.BUTTON_NEGATIVE, getString(R.string.cancel)) { dialogInterface, i ->
-                //runnable.
-            }
+            setMessage("Sending request")
             setCancelable(false)
             show()
         }
@@ -273,7 +272,7 @@ class HomeActivity : AppCompatActivity() {
         getRadio = findViewById(R.id.rb_get)
         postRadio = findViewById(R.id.rb_post)
         urlEt = findViewById(R.id.et_url)
-        requestBody = findViewById(R.id.et_request_body)
+        requestBodyEt = findViewById(R.id.et_request_body)
 
         imageAddHeader = findViewById(R.id.iv_add_header)
         imageAddQuery = findViewById(R.id.iv_add_query)

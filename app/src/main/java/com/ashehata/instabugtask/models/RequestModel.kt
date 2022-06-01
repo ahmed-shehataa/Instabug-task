@@ -8,7 +8,7 @@ data class RequestModel(
      */
     val url: String = "",
     val requestType: RequestType = RequestType.NONE,
-    val headers: List<KeyValue> = emptyList(),
+    var headers: List<KeyValue> = emptyList(),
     val queryParameters: List<KeyValue> = emptyList(),
     val requestBody: String = "",
 ) : Serializable

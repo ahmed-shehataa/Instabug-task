@@ -58,7 +58,7 @@ class ResultActivity : AppCompatActivity() {
             val responseHeaders = responseModel.headers
             val requestHeaders = responseModel.requestModel?.headers
             if (responseHeaders != null) {
-                showHeadersDialog(responseHeaders,requestHeaders)
+                showHeadersDialog(responseHeaders, requestHeaders)
             }
         }
     }
@@ -81,12 +81,18 @@ class ResultActivity : AppCompatActivity() {
     private fun displayResponseData() {
         responseModel.apply {
             tvCode.text = responseCode.toString()
-            tvError.text = displayErrorMessage(error)
 
+            if (!this.errorMessage.isNullOrEmpty()) {
+                tvError.text = errorMessage
+            } else {
+                tvError.text = displayErrorMessage(error)
+            }
             tvRequestBody.text = requestModel?.requestBody
-
             tvResponseBody.text = responseBody
+        }
 
+        if (responseModel.requestModel?.queryParameters.isNullOrEmpty()) {
+            linearQuery.visibility = View.GONE
         }
 
         when (responseModel.requestModel?.requestType) {
@@ -101,18 +107,18 @@ class ResultActivity : AppCompatActivity() {
     }
 
     private fun displayErrorMessage(error: HttpErrorType?): String {
-            return when (error) {
-                HttpErrorType.None -> "No Error"
-                HttpErrorType.BadGateway -> "Bad gateway"
-                HttpErrorType.BadRequest -> "BadRequest"
-                HttpErrorType.DataInvalid -> "DataInvalid"
-                HttpErrorType.Forbidden -> "Forbidden "
-                HttpErrorType.InternalServerError -> "InternalServerError "
-                HttpErrorType.NotAuthorized -> "NotAuthorized "
-                HttpErrorType.NotFound -> "NotFound "
-                HttpErrorType.Unknown -> "Unknown "
-                else -> "No Error"
-            }
+        return when (error) {
+            HttpErrorType.None -> "No Error"
+            HttpErrorType.BadGateway -> "Bad gateway"
+            HttpErrorType.BadRequest -> "BadRequest"
+            HttpErrorType.DataInvalid -> "DataInvalid"
+            HttpErrorType.Forbidden -> "Forbidden "
+            HttpErrorType.InternalServerError -> "InternalServerError "
+            HttpErrorType.NotAuthorized -> "NotAuthorized "
+            HttpErrorType.NotFound -> "NotFound "
+            HttpErrorType.Unknown -> "Unknown "
+            else -> "No Error"
+        }
 
     }
 }

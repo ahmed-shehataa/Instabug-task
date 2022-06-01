@@ -8,6 +8,14 @@ import java.lang.StringBuilder
 import java.net.HttpURLConnection
 import java.net.URL
 
+private const val TAG = "makeApiCall"
+
+
+private val PREDEFINED_HEADERS = listOf(
+    KeyValue(key = "Content-Type", value = "application/json"),
+    KeyValue(key = "Accept", value = "application/json"),
+)
+
 /**
  *
  */
@@ -16,31 +24,65 @@ fun makeApiCall(
     onResponse: (ResponseModel) -> Unit,
 ) {
     var httpURLConnection: HttpURLConnection? = null
+    var responseCode = -1
     try {
         var myUrl = requestModel.url
-        if (requestModel.requestType == RequestType.GET) {
-            if (requestModel.queryParameters.isNotEmpty()) {
-                val query = StringBuilder()
-                query.append("?")
-                requestModel.headers.forEach {
-                    query.append(it.key + "=" + it.value)
-                }
-                myUrl = requestModel.url + query.toString()
+
+
+        if (requestModel.queryParameters.isNotEmpty()) {
+            val query = StringBuilder()
+            query.append("?")
+            requestModel.queryParameters.forEach {
+                query.append(it.key + "=" + it.value)
+                query.append("&")
             }
+            myUrl = requestModel.url + query.toString()
         }
+        Log.i(TAG, "makeApiCall: URL ->$myUrl")
+
+
+        Log.i(TAG, "makeApiCall: URL ->$myUrl")
+
 
         val url = URL(myUrl)
         httpURLConnection = url.openConnection() as HttpURLConnection
+
 
         // setting the  Request Method Type
         //OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, PATCH
         httpURLConnection.requestMethod = requestModel.requestType.name
 
+
+        /**
+         * To send request content, let's enable the URLConnection object's doOutput property to true.
+        Otherwise, we won't be able to write content to the connection output stream:
+         */
+        if (requestModel.requestType == RequestType.POST) {
+            httpURLConnection.doOutput = true
+            //httpURLConnection.doInput = true
+        }
+
+
+        requestModel.headers = requestModel.headers.toMutableList().apply {
+            addAll(PREDEFINED_HEADERS)
+        }
+
+
         requestModel.headers.forEach {
             httpURLConnection.setRequestProperty(it.key, it.value)
         }
 
-        val responseCode = httpURLConnection.responseCode
+        if (requestModel.requestBody.isNotEmpty()) {
+            httpURLConnection.outputStream.use { os ->
+                val input: ByteArray = requestModel.requestBody.toByteArray()
+                os.write(input, 0, input.size)
+            }
+            /* httpURLConnection.setRequestProperty("Content-Length",
+                 requestModel.requestBody.length.toString())
+             httpURLConnection.getOutputStream().write(requestModel.requestBody.toByteArray())*/
+        }
+
+        responseCode = httpURLConnection.responseCode
         Log.i("makeApiCall: ", responseCode.toString())
 
         val responseErrorType = when (responseCode) {
@@ -77,6 +119,7 @@ fun makeApiCall(
                         responseCode = responseCode,
                         responseBody = finalRes + finalRes + finalRes,
                         error = HttpErrorType.None,
+                        errorMessage = null
                     )
                 )
             }
@@ -88,6 +131,7 @@ fun makeApiCall(
                         responseCode = httpURLConnection.responseCode,
                         responseBody = result.toString(),
                         error = responseErrorType,
+                        errorMessage = null
                     )
                 )
             }
@@ -99,8 +143,8 @@ fun makeApiCall(
         onResponse(
             ResponseModel(
                 //headers = responseHeaders,
+                responseCode = responseCode,
                 requestModel = requestModel,
-                responseCode = httpURLConnection?.responseCode ?: -1,
                 responseBody = httpURLConnection?.responseMessage.toString(),
                 // todo get the correct error
                 error = HttpErrorType.InternalServerError,
