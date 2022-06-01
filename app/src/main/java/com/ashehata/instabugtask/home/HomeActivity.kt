@@ -198,10 +198,6 @@ class HomeActivity : AppCompatActivity() {
                 }
                 else -> RequestType.NONE
             }
-            /* // after that try to get data
-             requestBodyEt.setText("{\"name\": \"Upendra\", \"job\": \"Programmer\"}")
-             urlEt.setText("https://reqres.in/api/users")*/
-
             val headersList = collectHeadersData()
             val queries = collectQueriesData()
 
@@ -219,7 +215,11 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun sendGetDataIntent(mRequestModel: RequestModel) {
-        viewModel.intentLiveData.value = HomeIntent.GetResponse(mRequestModel)
+        if (isNetworkConnected()) {
+            viewModel.intentLiveData.value = HomeIntent.GetResponse(mRequestModel)
+        } else {
+            Toast.makeText(this, "No internet", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun openResultScreen(responseModel: ResponseModel) {

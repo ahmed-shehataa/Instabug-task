@@ -1,4 +1,4 @@
-package com.ashehata.instabugtask.singelton
+package com.ashehata.instabugtask.singleton
 
 import com.ashehata.instabugtask.home.HomeRepository
 import com.ashehata.instabugtask.home.HomeUseCase

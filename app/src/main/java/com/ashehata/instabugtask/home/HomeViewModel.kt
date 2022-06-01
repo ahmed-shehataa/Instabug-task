@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.ashehata.instabugtask.custom.RequestTypeException
 import com.ashehata.instabugtask.custom.URLFieldException
 import com.ashehata.instabugtask.models.ResponseModel
-import com.ashehata.instabugtask.singelton.Singleton
+import com.ashehata.instabugtask.singleton.Singleton
 import com.ashehata.instabugtask.util.LogMe
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
