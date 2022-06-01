@@ -1,24 +1,20 @@
 package com.ashehata.instabugtask.home
 
-import android.app.ProgressDialog
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import com.ashehata.instabugtask.util.makeApiCall
 import com.ashehata.instabugtask.R
 import com.ashehata.instabugtask.databinding.ActivityHomeBinding
-import com.ashehata.instabugtask.result.ResultActivity
 import com.ashehata.instabugtask.models.*
+import com.ashehata.instabugtask.result.ResultActivity
 import com.ashehata.instabugtask.util.LogMe
 import com.ashehata.instabugtask.util.isNetworkConnected
-import com.ashehata.instabugtask.util.isValidURL
-import java.lang.Exception
 import java.util.concurrent.*
 
 
