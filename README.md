@@ -10,6 +10,10 @@
 </p>
 
 
+
+## APK Download:
+[Click here](https://drive.google.com/drive/u/0/folders/1qNqkgHqWy9jcexae_uSZLWZVJmhPxp_O)
+
 ### Tools & APIs:
 - Kotlin
 - View Binding   
@@ -30,9 +34,6 @@ Mvvm, Mvi for Home Activity.
 <p align="left">
   <img src="img/arch.png" height="400" width="350">
 </p>
-
-### APK Download:
-[Click here](https://soundcloud.com/discover)
 
 
 ### Requriments:
