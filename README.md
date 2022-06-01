@@ -9,9 +9,30 @@
   <img src="img/app6.png" height="400" width="200">
 </p>
 
+### Some Documented functions
+<p align="center">
+  <img src="img/doc1.png" height="400" width="400">
+  <img src="img/doc2.png" height="400" width="400">
+  <img src="img/doc3.png" height="400" width="400">
+</p>
+
+### Tools & APIs:
+- Kotlin
+- View Binding   
+- ViewModel
+- Live data
+- I didn't use Dagger hilt for DI as it's considered as 3rd parties.
+
+### Code Architecture:
+Mvvm, Mvi for Home Activity.
+<p align="left">
+  <img src="img/arch.png" height="200" width="200">
+</p>
 
 ### APK Download:
 [Click here](https://soundcloud.com/discover)
+
+
 ### Requriments:
 We need you to create an application that will help in testing backed APIs.
 This application must allow us to do the following:
@@ -48,5 +69,10 @@ used: [Executers](https://developer.android.com/reference/java/util/concurrent/E
 used: [HttpURLConnection](https://developer.android.com/reference/java/net/HttpURLConnection)
 
 ### Endpoints for test:
-[Daily cat facts](https://alexwohlbruck.github.io/cat-facts/docs/)
+GET request: [Daily cat facts](https://alexwohlbruck.github.io/cat-facts/docs/)     
+
+POST request: https://reqres.in/api/users    
+Request body -> `{\"name\": \"Upendra\", \"job\": \"Programmer\"}`
+
+
 
